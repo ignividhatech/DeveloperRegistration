@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IgnividhaTech Developer Recruitment</title>
+  <script>
+    // Tailwind config for dark mode via class
+    tailwind = { config: { darkMode: 'class' } };
+    // Set initial theme early to avoid FOUC
+    (function() {
+      try {
+        const saved = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const isDark = saved ? (saved === 'dark') : prefersDark;
+        if (isDark) document.documentElement.classList.add('dark');
+      } catch (e) {}
+    })();
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* Custom styles to mimic the dark, techy feel */
+    :root {
+      --primary-dark: #070e17; /* Very dark background */
+      --accent-cyan: #06b6d4; /* Tailwind cyan-500 */
+      --accent-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--primary-dark);
+    }
+    /* Light mode overrides */
+    html:not(.dark) body {
+      background-color: #f6f7fb;
+      color: #0f172a;
+    }
+    html:not(.dark) .card {
+      background-color: #ffffff !important;
+      border-color: rgba(15,23,42,0.1) !important;
+    }
+  html:not(.dark) .header-link { color: #0f172a !important; }
+  html:not(.dark) .header-link:hover { color: #111827 !important; }
+    .neon-glow {
+      text-shadow: 0 0 8px var(--accent-cyan);
+    }
+    .card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      background-color: #0f172a; /* Dark slate blue */
+      border: 1px solid rgba(6, 182, 212, 0.3); /* Cyan border */
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(6, 182, 212, 0.25);
+    }
+    .header-link:hover {
+      color: var(--accent-cyan);
+      text-shadow: 0 0 5px rgba(6, 182, 212, 0.5);
+    }
+    html {
+        scroll-behavior: smooth;
+    }
+    .hero-title {
+      color: #ffffff;
+      -webkit-text-stroke: 3px #000000;
+      text-stroke: 3px #000000;
+      text-shadow:
+        3px 3px 0px #1a1a1a,
+        6px 6px 0px #2a2a2a,
+        9px 9px 0px #3a3a3a,
+        12px 12px 20px rgba(0,0,0,0.8);
+      letter-spacing: 0.05em;
+      paint-order: stroke fill;
+      line-height: 0.9;
+    }
+    @media (max-width: 640px) {
+      .hero-title { font-size: 3.5rem; -webkit-text-stroke: 2px #000; text-shadow: 4px 4px 10px rgba(0,0,0,0.6); }
+    }
+    .hero-cta {
+      display: inline-block;
+      background: #ffffff;
+      color: #0b1220;
+      padding: 12px 34px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 1.125rem;
+      border: 1px solid rgba(11,18,32,0.06);
+      box-shadow: 0 18px 40px rgba(2,6,23,0.45), 0 8px 24px rgba(6,182,212,0.06);
+      transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+      margin-top: -1.5rem;
+      padding-top: 14px;
+      padding-bottom: 14px;
+      min-width: 220px;
+    }
+    .hero-cta:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 28px 60px rgba(2,6,23,0.5); }
+    html.dark .hero-cta { background: #0b1220; color: #fff; border-color: rgba(255,255,255,0.04); box-shadow: 0 18px 40px rgba(0,0,0,0.6); }
+    .hero-content { padding-top: 2.25rem; padding-bottom: 1rem; }
+    @media (min-width: 640px) {
+      .hero-content { padding-top: 3.25rem; }
+    }
+    @media (min-width: 1024px) {
+      .hero-content { padding-top: 4.75rem; }
+    }
+  .hero-cta { display:inline-flex; align-items:center; justify-content:center; min-height:56px; margin-top:0.5rem; }
+    .timeline-container::before {
+      content: '';
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 3px;
+      height: calc(100% - 20px);
+      background-color: var(--accent-cyan);
+      opacity: 0.3;
+      border-radius: 2px;
+    }
+    @media (max-width: 767px) {
+        .timeline-container::before {
+            left: 14px;
+        }
+    }
+    @keyframes updateScroll {
+      0% {
+        transform: translateY(var(--updateTickerHeight, 80px)); /* Start at the BOTTOM */
+      }
+      100% {
+        transform: translateY(-50%); /* Scroll to the start of the duplicate list */
+      }
+    }
+
+    .update-scroll-text {
+      animation: updateScroll var(--updateTickerDuration, 16s) linear infinite;
+      display: block;
+      position: absolute;
+      top: 0; /* anchor to top so transforms measure from the top edge */
+      left: 0;
+      right: 0;
+      will-change: transform;
+    }
+    .update-scroll-container {
+      height: var(--updateTickerHeight, 80px);
+      max-height: var(--updateTickerHeight, 80px);
+    }
+  html.dark body { color: #e5e7eb; }
+  html:not(.dark) #about, 
+  html:not(.dark) #about h1,
+  html:not(.dark) #about h2,
+  html:not(.dark) #about h3,
+  html:not(.dark) #about p,
+  html:not(.dark) #about li {
+    color: #0f172a !important; /* slate-900 for titles */
+  }
+  html:not(.dark) #about p,
+  html:not(.dark) #about li {
+    color: #1f2937 !important; /* slate-800 for body text */
+  }
+  html:not(.dark) #qualifications, 
+  html:not(.dark) #qualifications h1,
+  html:not(.dark) #qualifications h2,
+  html:not(.dark) #qualifications h3,
+  html:not(.dark) #qualifications p,
+  html:not(.dark) #qualifications li {
+    color: #0f172a !important;
+  }
+  html:not(.dark) #qualifications p,
+  html:not(.dark) #qualifications li { color: #1f2937 !important; }
+  html:not(.dark) #positions .card h4 { color: #0f172a !important; }
+  html:not(.dark) #positions .card p { color: #374151 !important; }
+  html:not(.dark) #positions { 
+    background-color: #ffffff !important; 
+    border-top: 1px solid rgba(15,23,42,0.06) !important; 
+    border-bottom: 1px solid rgba(15,23,42,0.06) !important; 
+  }
+  html:not(.dark) #positions h2 { color: #0f172a !important; }
+    .nav-transparent {
+      background: transparent !important;
+      border-bottom: 0 !important;
+      position: absolute !important;
+      top: 0; left: 0; right: 0;
+      z-index: 60 !important;
+      box-shadow: none !important;
+      backdrop-filter: none !important;
+    }
+
+    #mainNav { transition: background-color 200ms ease, border-color 200ms ease, box-shadow 200ms ease; }
+
+    #mainNav.scrolled {
+      position: sticky !important;
+      background: #ffffff !important;
+      border-bottom: 1px solid #e5e7eb !important;
+      box-shadow: 0 4px 18px rgba(16,24,40,0.06) !important;
+    }
+
+    html.dark #mainNav.scrolled {
+      position: sticky !important;
+      background: #0b1220 !important;
+      border-bottom: 1px solid #1f2937 !important;
+      box-shadow: 0 4px 18px rgba(2,6,23,0.6) !important;
+    }
+  .nav-transparent .brand,
+  .nav-transparent .tagline { color: #ffffff !important; }
+  .nav-transparent .header-link { color: rgba(255,255,255,0.9) !important; }
+  .nav-transparent .header-link:hover { color: #ffffff !important; }
+
+  html:not(.dark) .nav-transparent {
+    background: rgba(255,255,255,0.92) !important;
+    border-bottom: 1px solid rgba(15,23,42,0.06) !important;
+    backdrop-filter: blur(6px);
+  }
+  html:not(.dark) .nav-transparent .brand,
+  html:not(.dark) .nav-transparent .tagline,
+  html:not(.dark) .nav-transparent .header-link {
+    color: #0f172a !important;
+  }
+
+  .nav-transparent.light-top {
+    background: rgba(255,255,255,0.92) !important;
+    border-bottom: 1px solid rgba(15,23,42,0.06) !important;
+    backdrop-filter: blur(6px);
+  }
+  .nav-transparent.light-top .brand,
+  .nav-transparent.light-top .tagline,
+  .nav-transparent.light-top .header-link {
+    color: #0f172a !important;
+  }
+
+    #mainNav.scrolled .brand,
+  #mainNav.scrolled .tagline { color: #111827 !important; }
+  #mainNav.scrolled .header-link { color: #374151 !important; }
+  html.dark #mainNav.scrolled .brand,
+  html.dark #mainNav.scrolled .tagline { color: #ffffff !important; }
+  html.dark #mainNav.scrolled .header-link { color: #e5e7eb !important; }
+
+  .nav-transparent #register-btn { box-shadow: 0 6px 18px rgba(0,0,0,0.12); }
+
+  html:not(.dark) .hero-bg {
+    background-image: url('static/background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  html.dark .hero-bg {
+    background-image: url('static/background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  .guidelines-bg {
+    background-image: url('static/background2.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  </style>
+</head>
+<body>
+
+  <nav id="mainNav" class="sticky top-0 z-50 nav-transparent shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <h1 class="brand text-2xl font-extrabold text-gray-900 dark:text-white tracking-wider"><span style="font-family: Georgia, serif; font-weight: 900;">I</span>gnividhaTech</h1>
+        <span class="tagline hidden sm:inline text-base md:text-lg font-semibold text-gray-800 dark:text-white">| Developer Recruitment</span>
+      </div>
+  <div class="flex items-center gap-6 md:gap-8">
+        <a href="#about" class="text-sm font-medium text-gray-700 dark:text-gray-300 header-link hidden md:inline whitespace-nowrap">About</a>
+        <a href="#positions" class="text-sm font-medium text-gray-700 dark:text-gray-300 header-link hidden md:inline whitespace-nowrap">Positions</a>
+        <a href="#qualifications" class="text-sm font-medium text-gray-700 dark:text-gray-300 header-link hidden md:inline whitespace-nowrap">Qualifications</a>
+        <a href="#guidelines" class="text-sm font-medium text-gray-700 dark:text-gray-300 header-link hidden md:inline whitespace-nowrap">Guidelines</a>
+      <a href="#" id="openUpdateSidebar" class="text-sm font-medium text-cyan-600 dark:text-cyan-400 header-link hidden md:inline whitespace-nowrap">Updates</a>
+      <button id="themeToggle" type="button"
+            class="hidden md:inline-flex items-center justify-center h-10 gap-2 px-3 rounded-lg border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800/50 transition"
+            aria-label="Toggle theme">
+          <svg class="icon-sun h-5 w-5 text-yellow-500 hidden" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12Z"/>
+            <path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <svg class="icon-moon h-5 w-5 text-gray-700 dark:text-cyan-300" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/>
+          </svg>
+        </button>
+        
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSeHbJNqjqYdAMxZy0CfHEg7xPkxxsPgvOTD46wK2l8PyU4G4g/viewform?usp=header" target="_blank" id="register-btn"
+            class="inline-flex items-center h-10 bg-white text-black px-5 rounded-lg font-semibold text-sm hover:bg-gray-200 transition shadow-lg shadow-cyan-900/40">
+          Register Now
+        </a>
+        </div>
+    </div>
+  </nav>
+
+  <section class="hero-bg bg-white dark:bg-[#0b1220] h-[70vh] md:h-[75vh] flex items-center justify-center relative overflow-hidden">
+    <div class="text-center px-4 max-w-4xl z-10 hero-content">
+      <span class="text-sm font-medium bg-red-600 text-white px-3 py-1 rounded-full mb-3 inline-block shadow-md">PAID OPPORTUNITY</span>
+      <h1 class="text-6xl md:text-8xl font-extrabold mb-4 tracking-wider hero-title">
+        IgnividhaTech
+      </h1>
+      <h2 class="text-4xl md:text-5xl font-semibold mb-6 text-gray-900 dark:text-white tracking-wide">
+        Developer Recruitment
+      </h2>
+      <p class="text-lg md:text-xl font-light mb-6 text-gray-700 dark:text-gray-300">
+        Work From Home – Part-Time: Project-Based Stipends
+      </p>
+      <p class="text-base md:text-lg font-semibold text-gray-900 dark:text-white/90 mb-6">
+        Open to all students and graduates interested in remote part-time work.
+      </p>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSeHbJNqjqYdAMxZy0CfHEg7xPkxxsPgvOTD46wK2l8PyU4G4g/viewform?usp=header" target="_blank" 
+      class="hero-cta">
+        Register Now
+      </a>
+    </div>
+  <div class="absolute inset-0 z-0 opacity-0 dark:opacity-15" style="background: radial-gradient(circle at 50% 10%, rgba(0,0,0,0.45) 0%, transparent 70%);"></div>
+  </section>
+
+  <section id="about" class="container mx-auto px-4 py-20 max-w-6xl">
+    <h2 class="text-3xl font-bold mb-12 text-gray-900 dark:text-white text-center">About the Opportunity</h2>
+    
+    <div class="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16">
+      <div class="md:w-2/5 text-center md:text-right">
+        <p class="text-gray-800 dark:text-gray-300 text-lg">
+          Join our remote developer team on a project-by-project basis. Earn stipends for completed work, not a fixed salary.
+        </p>
+      </div>
+      <div class="flex-shrink-0 order-first md:order-none">
+  <img src="static/logo.png" alt="IgnividhaTech Logo" loading="lazy" width="176" height="176" class="w-36 h-36 md:w-44 md:h-44 rounded-full object-cover border-4 border-white/50 shadow-lg shadow-white/40">
+      </div>
+      <div class="md:w-2/5 text-center md:text-left">
+        <p class="text-gray-800 dark:text-gray-300 text-lg">
+          Gain real-world experience on exciting projects with flexible hours. Work from anywhere and meet project deadlines to build your portfolio.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section id="positions" class="bg-gray-950 py-20 border-t border-b border-cyan-800/30">
+    <div class="container mx-auto px-4 max-w-6xl">
+      <h2 class="text-3xl font-bold text-center mb-12 text-white">We’re Looking For:</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="card rounded-xl p-6 text-center shadow-lg hover:shadow-cyan-900/50">
+          <span class="text-5xl mb-4 inline-block text-cyan-400">🖥</span>
+          <h4 class="font-semibold text-2xl mb-2 text-gray-900 dark:text-white">Frontend Developers</h4>
+          <p class="text-gray-600 dark:text-gray-400 text-sm">Build responsive user interfaces and web applications.</p>
+        </div>
+        <div class="card rounded-xl p-6 text-center shadow-lg hover:shadow-cyan-900/50">
+          <span class="text-5xl mb-4 inline-block text-yellow-400">⚙</span>
+          <h4 class="font-semibold text-2xl mb-2 text-gray-900 dark:text-white">Backend Developers</h4>
+          <p class="text-gray-600 dark:text-gray-400 text-sm">Design APIs, manage databases, and write server-side logic.</p>
+        </div>
+        <div class="card rounded-xl p-6 text-center shadow-lg hover:shadow-cyan-900/50">
+          <span class="text-5xl mb-4 inline-block text-gray-500 dark:text-gray-300">🌐</span>
+          <h4 class="font-semibold text-2xl mb-2 text-gray-900 dark:text-white">Full Stack Developers</h4>
+          <p class="text-gray-600 dark:text-gray-400 text-sm">Handle both client-side and server-side infrastructure.</p>
+        </div>
+        <div class="card rounded-xl p-6 text-center shadow-lg hover:shadow-cyan-900/50">
+          <span class="text-5xl mb-4 inline-block text-pink-400">📱</span>
+          <h4 class="font-semibold text-2xl mb-2 text-gray-900 dark:text-white">App Developers</h4>
+          <p class="text-gray-600 dark:text-gray-400 text-sm">Develop Android/iOS apps focused on performance.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="qualifications" class="container mx-auto px-4 py-20">
+    <h2 class="text-3xl font-bold text-center mb-16 text-gray-900 dark:text-white">Qualifications</h2>
+    
+    <div class="relative timeline-container max-w-3xl mx-auto">
+      <div class="flex flex-col md:grid md:grid-cols-2 gap-y-12">
+          
+        <div class="flex md:justify-end">
+          <div class="relative w-full md:w-10/12 pl-12 md:pl-0 md:pr-12">
+            <div class="absolute top-1 -left-1.5 md:left-auto md:-right-[1.1rem] w-6 h-6 rounded-full bg-cyan-500 shadow-md shadow-cyan-500/50 border-4 border-gray-900"></div>
+            <div class="card rounded-lg p-5">
+              <h3 class="font-bold text-lg mb-2 text-gray-900 dark:text-white">Core Requirement (All Applicants)</h3>
+              <p class="text-gray-600 dark:text-gray-400 text-sm">Strong portfolio or relevant experience demonstrating your skills.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="hidden md:block"></div>
+        <div class="hidden md:block"></div>
+
+        <div class="flex md:justify-start">
+          <div class="relative w-full md:w-10/12 pl-12 md:pl-12">
+            <div class="absolute top-1 -left-1.5 md:-left-[1.1rem] w-6 h-6 rounded-full bg-cyan-500 shadow-md shadow-cyan-500/50 border-4 border-gray-900"></div>
+            <div class="card rounded-lg p-5">
+              <h3 class="font-bold text-lg mb-2 text-gray-900 dark:text-white">For Students 👨‍🎓</h3>
+              <ul class="list-disc list-inside space-y-1 text-gray-600 dark:text-gray-400 text-sm">
+                <li>Currently enrolled in a degree or diploma program.</li>
+                <li>Project and work samples are recommended to showcase ability.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex md:justify-end">
+          <div class="relative w-full md:w-10/12 pl-12 md:pl-0 md:pr-12">
+            <div class="absolute top-1 -left-1.5 md:left-auto md:-right-[1.1rem] w-6 h-6 rounded-full bg-cyan-500 shadow-md shadow-cyan-500/50 border-4 border-gray-900"></div>
+            <div class="card rounded-lg p-5">
+              <h3 class="font-bold text-lg mb-2 text-gray-900 dark:text-white">For Graduates 🎓</h3>
+              <ul class="list-disc list-inside space-y-1 text-gray-600 dark:text-gray-400 text-sm">
+                  <li>Recent graduates with demonstrable projects or internships.</li>
+                  <li>Include project/work samples to showcase your experience.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </section>
+
+  <!-- Updates sidebar removed for static GitHub Pages to avoid startup messages -->
+
+  <section id="guidelines" class="relative pt-20 pb-12 guidelines-bg text-white">
+    <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/70"></div>
+    <div class="relative container mx-auto px-4 max-w-3xl">
+      <div class="rounded-2xl p-8 md:p-10 bg-black/55 backdrop-blur-md ring-1 ring-white/15 shadow-2xl">
+        <h2 class="text-3xl md:text-4xl font-extrabold text-center mb-6 leading-tight">
+          How We Select: Skill‑First, Project‑Driven
+        </h2>
+        <ul class="space-y-4 text-white/95 text-left mb-8">
+          <li class="flex items-start">
+            <span class="mr-3 mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-white text-sm shadow-md">✓</span>
+            <span class="flex-1">Real skills, portfolio quality, and team fit matter most—no buzzwords.</span>
+          </li>
+          <li class="flex items-start">
+            <span class="mr-3 mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-white text-sm shadow-md">↺</span>
+            <span class="flex-1">Didn’t make it this time? Level up and re‑apply—many succeed in later cycles.</span>
+          </li>
+        </ul>
+
+        <div class="text-center mb-8">
+          <h3 class="text-2xl font-semibold mb-2">Remote, Flexible, Outcome‑Focused</h3>
+          <p class="text-lg text-white/90">Work from anywhere. Part‑time, project‑based stipends.</p>
+          <p class="text-sm text-white/80 mt-2">Share your active links to GitHub and LinkedIn when you register.</p>
+          <div class="flex justify-center gap-10 mt-6">
+            <a href="https://www.linkedin.com/in/ignividhatech" target="_blank" aria-label="LinkedIn" class="flex flex-col items-center text-[#0A66C2] hover:text-[#0d4e8c] transition transform hover:scale-110">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-9 h-9">
+                <path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8h4v16h-4V8zm7.5 0h3.8v2.2h.05c.53-1 1.82-2.2 3.75-2.2 4 0 4.7 2.6 4.7 6V24h-4v-7.6c0-1.8 0-4.1-2.5-4.1s-2.9 2-2.9 3.9V24h-4V8z"/>
+              </svg>
+              <span class="sr-only">LinkedIn</span>
+              <span aria-hidden="true" class="mt-2 text-sm">LinkedIn</span>
+            </a>
+            <a href="https://www.instagram.com/ignividhatech?igsh=MWdlc2Z2MHZyaWdheg==" target="_blank" aria-label="Instagram" class="flex flex-col items-center text-[#E4405F] hover:text-[#ff6a88] transition transform hover:scale-110">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-9 h-9">
+                <path d="M7 2h10a5 5 0 015 5v10a5 5 0 01-5 5H7a5 5 0 01-5-5V7a5 5 0 015-5zm10 2H7a3 3 0 00-3 3v10a3 3 0 003 3h10a3 3 0 003-3V7a3 3 0 00-3-3zm-5 3a5 5 0 110 10 5 5 0 010-10zm6.5-.75a1.25 1.25 0 11-2.5 0 1.25 1.25 0 012.5 0z"/>
+              </svg>
+              <span class="sr-only">Instagram</span>
+              <span aria-hidden="true" class="mt-2 text-sm">Instagram</span>
+            </a>
+          </div>
+
+          <div class="mt-8">
+            <a href="#positions" class="inline-flex items-center gap-2 rounded-xl bg-cyan-500 text-black font-semibold px-5 py-3 hover:bg-cyan-400 transition shadow-lg shadow-cyan-900/40">
+              View Open Roles
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M13.172 12 8.222 7.05l1.414-1.414L16 12l-6.364 6.364-1.414-1.414z"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="text-center border-t border-white/15 pt-6">
+          <p class="text-base">📧 Contact: <a href="mailto:ignividhatech@gmail.com" class="text-cyan-200 hover:text-white transition">ignividhatech@gmail.com</a></p>
+          <p class="mt-3 text-sm text-white/70">© 2025 IgnividhaTech Developer Recruitment. All rights reserved.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    (function(){
+      const btn = document.getElementById('themeToggle');
+      if (!btn) return;
+      const iconSun = btn.querySelector('.icon-sun');
+      const iconMoon = btn.querySelector('.icon-moon');
+
+      function setLabels() {
+        const isDark = document.documentElement.classList.contains('dark');
+        if (!iconSun || !iconMoon) return;
+        iconSun.classList.toggle('hidden', !(!isDark));
+        iconMoon.classList.toggle('hidden', !(isDark));
+      }
+
+      setLabels();
+
+      btn.addEventListener('click', () => {
+        const root = document.documentElement;
+        const isDark = root.classList.toggle('dark');
+        try { localStorage.setItem('theme', isDark ? 'dark' : 'light'); } catch(e) {}
+        setLabels();
+      });
+    })();
+  </script>
+  <script>
+    (function(){
+      const nav = document.getElementById('mainNav');
+      if (!nav) return;
+        const onScroll = () => {
+          const atTop = window.scrollY <= 8;
+          if (!atTop) {
+            nav.classList.add('scrolled');
+            nav.classList.remove('nav-transparent');
+            nav.classList.remove('light-top');
+          } else {
+            nav.classList.remove('scrolled');
+            nav.classList.add('nav-transparent');
+            if (!document.documentElement.classList.contains('dark')) {
+              nav.classList.add('light-top');
+            } else {
+              nav.classList.remove('light-top');
+            }
+          }
+        };
+        onScroll();
+        window.addEventListener('scroll', onScroll, { passive: true });
+    })();
+  </script>
+  <!-- Update sidebar script removed to prevent startup messages on page load -->
+</body>
+</html>
