@@ -465,6 +465,11 @@
       </div>
     </aside>
 
+    <!-- Server-rendered updates JSON (optional). When running under Flask this is valid JSON;
+         when served as a static file (GitHub Pages) the raw template token will be present
+         and parsed safely by the client-side code below. -->
+    <script id="server-updates-json" type="application/json">{{ updates|tojson }}</script>
+
   <section id="guidelines" class="relative pt-20 pb-12 guidelines-bg text-white">
     <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/70"></div>
     <div class="relative container mx-auto px-4 max-w-3xl">
@@ -583,31 +588,44 @@
       const overlay = document.getElementById('updateOverlay');
       const updateEl = document.getElementById('updateText');
       const container = document.querySelector('.update-scroll-container');
-      const updatesApiUrl = "{{ url_for('api_updates') }}";
-      
-      // Base speed: e.g., 5 seconds per update item
-      const SCROLL_SPEED_PER_ITEM = 5; // in seconds
+  const updatesApiUrl = "{{ url_for('api_updates') }}";
+
+  // Base speed: e.g., 5 seconds per update item
+  const SCROLL_SPEED_PER_ITEM = 5; // in seconds
 
       async function setupMarquee() {
         let updatesData = [];
-        // 1. Fetch fresh updates
+        // 1. Try server-rendered JSON first (injected via Flask). This avoids an extra
+        //    network request when running under the Flask server. If parsing fails
+        //    (for example the file is served statically on GitHub Pages) we fall
+        //    back to fetching the API and finally to a safe message.
         try {
-          // Use a dummy array if {{ updates|tojson }} fails or is empty, to show functionality
-          let serverUpdates = {{ updates|tojson }};
-          if (!Array.isArray(serverUpdates) || serverUpdates.length === 0) {
-             const res = await fetch(updatesApiUrl, { cache: 'no-store' });
-             if (!res.ok) throw new Error('Failed to fetch updates');
-             const data = await res.json();
-             if (data && Array.isArray(data.updates)) {
-              updatesData = data.updates;
-             }
-          } else {
+          let serverUpdates = null;
+          try {
+            const el = document.getElementById('server-updates-json');
+            if (el && el.textContent) {
+              serverUpdates = JSON.parse(el.textContent);
+            }
+          } catch (e) {
+            // parsing failed (likely because the template tokens were not rendered)
+            serverUpdates = null;
+          }
+
+          if (Array.isArray(serverUpdates) && serverUpdates.length > 0) {
             updatesData = serverUpdates;
+          } else {
+            // Attempt to fetch from the API. If this 404s (static site), we'll handle it below.
+            const res = await fetch(updatesApiUrl, { cache: 'no-store' });
+            if (!res.ok) throw new Error('Failed to fetch updates');
+            const data = await res.json();
+            if (data && Array.isArray(data.updates)) {
+              updatesData = data.updates;
+            }
           }
         } catch (e) {
-          console.error(e);
-          // Fallback data in case fetch fails
-          updatesData = ["Error loading updates.", "Please check your connection."];
+          console.error('setupMarquee:', e);
+          // Fallback data in case everything else fails
+          updatesData = ["No updates available.", "(This is a static fallback.)"];
         }
 
         if (updatesData.length === 0) {
