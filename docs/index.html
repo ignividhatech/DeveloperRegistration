@@ -408,7 +408,22 @@
     </div>
   </section>
 
-  <!-- Updates sidebar removed for static GitHub Pages to avoid startup messages -->
+  <!-- Static Updates sidebar for GitHub Pages: shows fallback content and tries to fetch updates.json -->
+  <div id="updateOverlay" class="fixed inset-0 bg-black/40 z-40 hidden" aria-hidden="true"></div>
+
+  <aside id="updateSidebar" role="dialog" aria-modal="true" aria-hidden="true" class="fixed left-4 top-20 w-80 bg-white dark:bg-gray-900 shadow-2xl z-50 transition-transform duration-300 rounded-xl border-4 border-red-500" style="transform: translateX(-120%);">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-red-500 rounded-tr-xl">
+      <span class="text-lg font-semibold text-white">Latest Updates</span>
+      <button id="closeUpdateBtn" class="text-white text-2xl font-bold">&times;</button>
+    </div>
+    <div class="px-6 py-5">
+      <div class="update-scroll-container relative overflow-hidden w-full" style="--updateTickerHeight: 220px; --updateTickerDuration: 12s;">
+        <div id="updateText" class="update-scroll-text w-full px-2 text-gray-800 dark:text-gray-200 font-semibold text-base">
+          <div class="py-3">No updates available (static fallback).</div>
+        </div>
+      </div>
+    </div>
+  </aside>
 
   <section id="guidelines" class="relative pt-20 pb-12 guidelines-bg text-white">
     <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/70"></div>
@@ -513,6 +528,66 @@
         window.addEventListener('scroll', onScroll, { passive: true });
     })();
   </script>
-  <!-- Update sidebar script removed to prevent startup messages on page load -->
+  <!-- Update sidebar script for static GitHub Pages: lightweight, safe, and tries to load updates.json -->
+  <script>
+    (function(){
+      const updateBtn = document.getElementById('openUpdateSidebar');
+      const sidebar = document.getElementById('updateSidebar');
+      const overlay = document.getElementById('updateOverlay');
+      const closeBtn = document.getElementById('closeUpdateBtn');
+      const updateEl = document.getElementById('updateText');
+
+      if (!updateBtn || !sidebar) return;
+
+      async function loadUpdates() {
+        // Try to fetch repo-level updates.json served under the project path on GitHub Pages
+        const candidates = [
+          '/DeveloperRegistration/updates.json', // common when project pages are served at /<org>/<repo>/
+          '/updates.json', // fallback
+        ];
+        for (const url of candidates) {
+          try {
+            const res = await fetch(url, {cache: 'no-store'});
+            if (!res.ok) continue;
+            const data = await res.json();
+            if (Array.isArray(data)) return data;
+            if (data && Array.isArray(data.updates)) return data.updates;
+          } catch (e) {
+            // ignore and try next
+          }
+        }
+        return null;
+      }
+
+      async function openSidebar() {
+        sidebar.style.transform = 'translateX(0)';
+        sidebar.setAttribute('aria-hidden', 'false');
+        if (overlay) overlay.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+
+        // attempt to load updates and render
+        if (updateEl) {
+          const updates = await loadUpdates();
+          if (Array.isArray(updates) && updates.length>0) {
+            updateEl.innerHTML = updates.map(u=>`<div class=\"py-3\">${u}</div>`).join('') + updates.map(u=>`<div class=\"py-3\">${u}</div>`).join('');
+          } else {
+            updateEl.innerHTML = '<div class="py-3">No updates available.</div>';
+          }
+        }
+      }
+
+      function closeSidebar(){
+        sidebar.style.transform = 'translateX(-120%)';
+        sidebar.setAttribute('aria-hidden', 'true');
+        if (overlay) overlay.classList.add('hidden');
+        document.body.style.overflow = '';
+      }
+
+      updateBtn.addEventListener('click', function(e){ e.preventDefault(); openSidebar(); });
+      if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+      if (overlay) overlay.addEventListener('click', closeSidebar);
+      document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && sidebar.getAttribute('aria-hidden') === 'false') closeSidebar(); });
+    })();
+  </script>
 </body>
 </html>
