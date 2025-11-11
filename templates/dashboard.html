@@ -583,11 +583,11 @@
   <script>
     // Update Sidebar functionality (Marquee Version)
     (function(){
-      const updateBtn = document.getElementById('openUpdateSidebar');
-      const sidebar = document.getElementById('updateSidebar');
-      const overlay = document.getElementById('updateOverlay');
-      const updateEl = document.getElementById('updateText');
-      const container = document.querySelector('.update-scroll-container');
+  const updateBtn = document.getElementById('openUpdateSidebar');
+  const sidebar = document.getElementById('updateSidebar');
+  const overlay = document.getElementById('updateOverlay');
+  const updateEl = document.getElementById('updateText');
+  const container = document.querySelector('.update-scroll-container');
   const updatesApiUrl = "{{ url_for('api_updates') }}";
 
   // Base speed: e.g., 5 seconds per update item
@@ -654,7 +654,11 @@
         updateEl.style.animationPlayState = 'running';
       }
 
-      if (!updateBtn || !sidebar || !updateEl || !container) return;
+      // We only require the button and sidebar to exist. The marquee content
+      // elements may be missing (for example on simplified/static previews),
+      // but the button should still open the sidebar. Attach listener only
+      // if the essential elements exist.
+      if (!updateBtn || !sidebar) return;
 
       async function openSidebar() {
         sidebar.style.transform = 'translateX(0)';
@@ -663,8 +667,15 @@
         if (overlay) overlay.setAttribute('aria-hidden', 'false');
         document.body.style.overflow = 'hidden';
 
-        // Setup the marquee *after* the sidebar is open
-        await setupMarquee();
+        // Setup the marquee *after* the sidebar is open, but only if both
+        // the update element and container exist. Guard to avoid throwing.
+        if (updateEl && container) {
+          try {
+            await setupMarquee();
+          } catch (e) {
+            console.error('Failed to setup marquee:', e);
+          }
+        }
       }
 
       function closeSidebar() {
@@ -673,10 +684,16 @@
         if (overlay) overlay.classList.add('hidden');
         if (overlay) overlay.setAttribute('aria-hidden', 'true');
         document.body.style.overflow = '';
-        
-        // Stop animation and clear content when closed
-        updateEl.style.animationPlayState = 'paused';
-        updateEl.innerHTML = '';
+
+        // Stop animation and clear content when closed (only if present)
+        if (updateEl) {
+          try {
+            updateEl.style.animationPlayState = 'paused';
+            updateEl.innerHTML = '';
+          } catch (e) {
+            console.error('Error clearing update element:', e);
+          }
+        }
       }
 
       // --- Event Listeners ---
@@ -688,15 +705,15 @@
 
       window.closeUpdateSidebar = closeSidebar;
 
-      // Pause on hover
-      container.addEventListener('mouseenter', () => {
-        updateEl.style.animationPlayState = 'paused';
-      });
-
-      // Resume on mouse leave
-      container.addEventListener('mouseleave', () => {
-        updateEl.style.animationPlayState = 'running';
-      });
+      // Pause/resume on hover (only if container exists)
+      if (container && updateEl) {
+        container.addEventListener('mouseenter', () => {
+          try { updateEl.style.animationPlayState = 'paused'; } catch (e) {}
+        });
+        container.addEventListener('mouseleave', () => {
+          try { updateEl.style.animationPlayState = 'running'; } catch (e) {}
+        });
+      }
 
       if (overlay) {
         overlay.addEventListener('click', closeSidebar);
